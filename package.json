@@ -1,0 +1,45 @@
+{
+  "name": "flyriise-aviation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Premium aviation & hospitality training website — Flyriise Aviation & Hospitality Services.",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "verify:content": "node scripts/verify-content.mjs",
+    "verify:content:self-test": "node scripts/verify-content.mjs --self-test",
+    "check": "npm run typecheck && npm run lint && npm run test && npm run verify:content"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "5.9.1",
+    "@radix-ui/react-accordion": "1.2.20",
+    "@radix-ui/react-dialog": "1.1.23",
+    "@react-three/fiber": "9.8.1",
+    "next": "16.3.8",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-hook-form": "7.89.0",
+    "three": "0.186.1",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/three": "0.186.0",
+    "eslint": "^9.39.0",
+    "eslint-config-next": "16.3.8",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3",
+    "vitest": "5.0.3"
+  }
+}

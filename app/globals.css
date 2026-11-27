@@ -1,0 +1,406 @@
+@import "tailwindcss";
+
+/* ===========================================================================
+   FLYRII SE — DESIGN TOKENS
+   Single source of truth. Components must not hard-code colour values.
+   Direction: "Ascent" — dark apron at dusk climbing into blue hour, first
+   light, daylight, and a night arrival. Quiet luxury, aerospace precision.
+   =========================================================================== */
+
+@theme {
+  /* --- Core palette (brief §05) ------------------------------------------ */
+  --color-apron: #070b14; /* deepest dark: hero, footer, boards */
+  --color-twilight: #12203a; /* dark surfaces */
+  --color-twilight-2: #17294a; /* raised dark surface */
+  --color-cirrus: #e6edf6; /* light section surface */
+  --color-cloud: #f7f9fc; /* forms / legal / reading */
+  --color-ink: #0a1222; /* text on light */
+  --color-amber: #ffb224; /* single primary accent: CTA, focus, data */
+  /*
+   * The accent re-toned for light surfaces. #ffb224 measures ~1.5:1 as text on
+   * cloud/cirrus; this bronze keeps the same hue family at 5.0:1. Applied by
+   * the [data-surface="light"] rule below, not by hand at every call site.
+   */
+  --color-amber-ink: #8a5a00;
+
+  /* --- Supporting neutrals ---------------------------------------------- */
+  --color-steel: #93a6c4; /* muted text on dark */
+  /*
+   * Faintest text on dark. Lightened from #5d6f8d after an axe-core run
+   * measured 3.6–3.9:1 for 11px mono labels on apron surfaces (WCAG AA needs
+   * 4.5:1). This value clears 4.5:1 on apron, twilight and twilight-2 — see
+   * docs/QA_REPORT.md (A11Y-1).
+   */
+  --color-steel-deep: #8695b6;
+  --color-graphite: #46536b; /* muted text on light */
+  --color-hairline: rgb(230 237 246 / 0.12); /* 1px engineering rules (dark) */
+  --color-hairline-strong: rgb(230 237 246 / 0.24);
+  --color-hairline-light: rgb(10 18 34 / 0.14);
+  --color-hairline-light-strong: rgb(10 18 34 / 0.28);
+  --color-verified: #2fb383; /* verified claim lamp */
+  --color-pending: #7f8fab; /* pending / reference claim lamp */
+  --color-alert: #e0603c; /* errors */
+
+  /* --- Typography -------------------------------------------------------- */
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  --font-mono: var(--font-b612), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --text-eyebrow: 0.6875rem; /* 11px mono operational label */
+  --text-eyebrow--line-height: 1.2;
+  --text-eyebrow--letter-spacing: 0.18em;
+
+  --text-display-1: clamp(2.5rem, 9.2vw, 6rem);
+  --text-display-1--line-height: 0.94;
+  --text-display-2: clamp(2rem, 5.6vw, 3.75rem);
+  --text-display-2--line-height: 1;
+  --text-display-3: clamp(1.5rem, 3.4vw, 2.25rem);
+  --text-display-3--line-height: 1.08;
+  --text-stat: clamp(2.25rem, 7vw, 4rem);
+  --text-stat--line-height: 0.9;
+
+  /* --- Geometry (precision over softness) -------------------------------- */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-pill: 999px;
+
+  --shadow-lift: 0 24px 60px -32px rgb(7 11 20 / 0.55);
+  --shadow-board: 0 40px 120px -60px rgb(0 0 0 / 0.9);
+
+  /* --- Motion ------------------------------------------------------------ */
+  --ease-ascent: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-instrument: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Motion is fully killable: OS preference or the in-page control. */
+@custom-variant reduced (
+  @media (prefers-reduced-motion: reduce) { @slot; }
+);
+@custom-variant motion-allowed (
+  @media not (prefers-reduced-motion: reduce) { @slot; }
+);
+
+/* ===========================================================================
+   BASE
+   =========================================================================== */
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --gutter: clamp(1.25rem, 4vw, 3.5rem);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    /* Sticky header offset for anchor navigation. */
+    scroll-padding-top: 5.5rem;
+  }
+
+  body {
+    background-color: var(--color-apron);
+    color: var(--color-cirrus);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.62;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Visible, consistent focus ring everywhere. */
+  :focus-visible {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 3px;
+    border-radius: var(--radius-xs);
+  }
+
+  ::selection {
+    background: var(--color-amber);
+    color: var(--color-ink);
+  }
+
+  /* Tabular numerals for anything instrument-like. */
+  .tnum,
+  code,
+  kbd,
+  samp {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Honour the OS reduced-motion preference for CSS-driven motion. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  /* Honour the in-page "Reduce motion and 3D" control. */
+  [data-reduce-motion="true"] {
+    scroll-behavior: auto;
+  }
+  [data-reduce-motion="true"] *,
+  [data-reduce-motion="true"] *::before,
+  [data-reduce-motion="true"] *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ===========================================================================
+   COMPONENT PRIMITIVES
+   Small, reusable, and shared by every section so the language stays coherent.
+   =========================================================================== */
+
+@layer components {
+  /* Page gutter + max measure, consistent across all routes. */
+  .container-x {
+    width: 100%;
+    max-width: 84rem;
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .container-wide {
+    width: 100%;
+    max-width: 96rem;
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .measure {
+    max-width: 68ch;
+  }
+
+  .measure-tight {
+    max-width: 52ch;
+  }
+
+  /* Instrument label: mono, tracked, uppercase. */
+  .mono-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-eyebrow);
+    line-height: 1.2;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Editorial display type: slightly expanded width, tight tracking. */
+  .display {
+    font-weight: 600;
+    font-stretch: 108%;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  .display-tight {
+    font-weight: 500;
+    font-stretch: 104%;
+    letter-spacing: -0.03em;
+  }
+
+  /* Hairline rules in the brand's radius-free language. */
+  .rule-dark {
+    border-color: var(--color-hairline);
+  }
+  .rule-light {
+    border-color: var(--color-hairline-light);
+  }
+
+  /* Engineering grid overlay — used sparingly, never on text blocks. */
+  .grid-lines {
+    background-image:
+      linear-gradient(to right, var(--color-hairline) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--color-hairline) 1px, transparent 1px);
+    background-size: 96px 96px;
+    mask-image: radial-gradient(120% 90% at 50% 0%, black 0%, transparent 78%);
+  }
+
+  /* Subtle film grain so flat dark areas feel photographic, not flat. */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.28;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+    mix-blend-mode: soft-light;
+  }
+
+  /* Runway marking: dashed amber rule used for section transitions. */
+  .runway-rule {
+    background-image: repeating-linear-gradient(
+      to right,
+      var(--color-amber) 0 26px,
+      transparent 26px 44px
+    );
+    height: 2px;
+    opacity: 0.85;
+  }
+
+  /* Corner ticks — the "engineering drawing" motif. */
+  .ticks {
+    position: relative;
+  }
+  .ticks::before,
+  .ticks::after {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-color: var(--color-amber);
+    opacity: 0.7;
+  }
+  .ticks::before {
+    top: -1px;
+    left: -1px;
+    border-top: 1px solid;
+    border-left: 1px solid;
+  }
+  .ticks::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 1px solid;
+    border-right: 1px solid;
+  }
+
+  /* Reveal primitive: content is visible by default; JS only adds motion. */
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal[data-reveal="pending"] {
+      opacity: 0;
+      transform: translate3d(0, 14px, 0);
+    }
+    .reveal[data-reveal="active"] {
+      opacity: 1;
+      transform: none;
+      transition:
+        opacity 0.72s var(--ease-ascent),
+        transform 0.72s var(--ease-ascent);
+      transition-delay: var(--reveal-delay, 0ms);
+    }
+  }
+
+  /* Scroll-linked draw for SVG flight paths (base = fully drawn). */
+  .draw-path {
+    stroke-dasharray: 2400;
+    stroke-dashoffset: 0;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal[data-reveal="pending"] .draw-path {
+      stroke-dashoffset: 2400;
+    }
+    .reveal[data-reveal="active"] .draw-path {
+      transition: stroke-dashoffset 2.1s var(--ease-ascent);
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* Native details-based accordion fallback styling. */
+  .field {
+    width: 100%;
+    background: #ffffff;
+    color: var(--color-ink);
+    border: 1px solid var(--color-hairline-light-strong);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 0.875rem;
+    font-size: 1rem;
+    line-height: 1.4;
+    transition: border-color 0.18s var(--ease-instrument);
+  }
+  .field:hover {
+    border-color: rgb(10 18 34 / 0.45);
+  }
+  .field:focus-visible {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 2px;
+    border-color: var(--color-ink);
+  }
+  .field[aria-invalid="true"] {
+    border-color: var(--color-alert);
+    background: #fff7f5;
+  }
+
+  /* Dark-mode boards (departures board, hero HUD). */
+  .board {
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.04), transparent 40%),
+      var(--color-apron);
+    border: 1px solid var(--color-hairline);
+    box-shadow: var(--shadow-board);
+  }
+}
+
+/* ===========================================================================
+   SURFACE-AWARE ACCENT
+   Unlayered on purpose: in Tailwind v4 the utilities layer beats the components
+   layer no matter how specific a selector is, so this override has to sit
+   outside both. `Section` marks light surfaces with data-surface="light";
+   amber measures ~1.5:1 as text on cloud, this keeps it readable without
+   threading a light/dark prop through every chip and marker.
+   =========================================================================== */
+
+[data-surface="light"] .text-amber {
+  color: var(--color-amber-ink);
+}
+
+/* ===========================================================================
+   KEYFRAMES
+   =========================================================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===========================================================================
+   UTILITIES
+   =========================================================================== */
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Horizontal rails on mobile: snap, but never hide content from keyboard. */
+@utility rail {
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+@utility snap-item {
+  scroll-snap-align: start;
+}
